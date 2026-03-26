@@ -8,6 +8,13 @@ var balls: Array = []
 var clients: Array = []
 var grid: SpatialHashGridFast3D
 
+#benchmark variables:
+var use_spatial := true
+var query_time_ms := 0
+var broadphase_candidate_count := 0
+var collision_pair_count := 0
+
+
 func _ready():
 	grid = SpatialHashGridFast3D.new(5.0)  # no world size needed anymore
 	add_child(grid)
@@ -29,12 +36,31 @@ func _process(delta):
 		clients[i].position = balls[i].position
 		grid.update(clients[i], old_pos)
 	var detector = $Detector
+
+	broadphase_candidate_count = 0
+	collision_pair_count = 0
+	var start = Time.get_ticks_usec()
+
 	var nearby = grid._find_nearby(detector.position, neighbour_radius)
+
+	var end = Time.get_ticks_usec()
+	query_time_ms = (end - start) / 1000.0
+
 	for b in balls:
 		b.set_color(Color.WHITE)
 	for client in nearby:
+		broadphase_candidate_count += 1
 		var dist = client.position.distance_to(detector.position)
 		if dist < detect_radius:
+			collision_pair_count += 1
 			client.data.set_color(Color.RED)
 		elif dist < neighbour_radius:
 			client.data.set_color(Color.YELLOW)
+
+# print benchmark
+	print(
+		"Objects: ", balls.size(),
+		"Query(ms): ", query_time_ms,
+		"Candidates: ", broadphase_candidate_count,
+		"Collisions: ", collision_pair_count
+		)
