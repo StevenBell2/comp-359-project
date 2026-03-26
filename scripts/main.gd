@@ -7,6 +7,7 @@ extends Node3D
 var balls: Array = []
 var clients: Array = []
 var grid: SpatialHashGridFast3D
+var naive = preload("res://scripts/naive.gd").new()
 
 #benchmark variables:
 var use_spatial := true
@@ -31,6 +32,12 @@ func _ready():
 		clients.append(client)
 
 func _process(delta):
+
+	#toggle between naive and spatial
+	if Input.is_action_just_pressed("ui_accept"):
+	use_spatial = !use_spatial
+	print("Using Spatial Hash:", use_spatial)
+
 	for i in clients.size():
 		var old_pos = clients[i].position
 		clients[i].position = balls[i].position
@@ -41,7 +48,11 @@ func _process(delta):
 	collision_pair_count = 0
 	var start = Time.get_ticks_usec()
 
-	var nearby = grid._find_nearby(detector.position, neighbour_radius)
+	var nearby
+	if use_spatial:
+		nearby = grid._find_nearby(detector.position, neighbour_radius)
+	else:
+		nearby = naive.find_nearby_naive(balls, detector.position, neighbour_radius)
 
 	var end = Time.get_ticks_usec()
 	query_time_ms = (end - start) / 1000.0
