@@ -11,10 +11,11 @@ var naive = preload("res://scripts/naive.gd").new()
 
 #benchmark variables:
 var use_spatial := true
-var query_time_ms := 0
+var query_time_ms := 0.0
 var broadphase_candidate_count := 0
 var collision_pair_count := 0
-
+var print_timer := 0.0 
+var print_interval := 5.0
 
 func _ready():
 	grid = SpatialHashGridFast3D.new(5.0)  # no world size needed anymore
@@ -69,9 +70,12 @@ func _process(delta):
 			client.data.set_color(Color.YELLOW)
 
 # print benchmark
-	print(
-		"Objects: ", balls.size(),
-		"Query(ms): ", query_time_ms,
-		"Candidates: ", broadphase_candidate_count,
-		"Collisions: ", collision_pair_count
+print_timer += delta 
+if print_timer >= print_interval: 
+	print_timer = 0.0
+	print( 
+		"Objects: ", balls.size(), 
+		" | Query(ms): ", query_time_ms, 
+		" | Candidates: ", broadphase_candidate_count, 
+		" | Collisions: ", collision_pair_count 
 		)
