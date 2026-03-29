@@ -24,6 +24,8 @@ var info_label: Label
 var collision_pair_count: int = 0
 var broadphase_candidate_count: int = 0
 var query_time_ms: float = 0.0
+var print_timer := 0.0
+var print_interval := 5.0
 
 var use_spatial := true
 var naive := Naive.new()
@@ -46,6 +48,17 @@ func _process(delta: float) -> void:
 	_detect_collisions()
 	_update_visuals()
 	_update_ui()
+
+	print_timer += delta
+	if print_timer >= print_interval:
+	    print_timer = 0.0
+	    print(
+	        "Entities: ", entity_count,
+	        " | Mode: ", ("Spatial" if use_spatial else "Naive"),
+	        " | Query(ms): ", query_time_ms,
+	        " | Candidates: ", broadphase_candidate_count,
+	        " | Collisions: ", collision_pair_count
+	    )
 
 func _setup_simulation() -> void:
 	var world_min := Vector3(-world_size, -world_size, -world_size)
