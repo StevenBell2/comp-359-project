@@ -1,4 +1,4 @@
-# Hsah Tables for 3D Spatial Management of Moving Items
+# Hash Tables for 3D Spatial Management of Moving Items
 
 Using the Godot game engine, we implemented and tested spatial hash grids for collision detection between thousands of entities. This includes a simulation script that visualizes collisions between entities, displays information about the number of detections and the query time, and an optional toggle to display the grid cells. We used this simulation to compare the efficiency and runtime of three implementations and documented the results.
 

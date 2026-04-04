@@ -114,6 +114,7 @@ func find_nearby(pos: Vector3, radius: float) -> void:
                     (xi * hash_constants[0]) ^ (yi * hash_constants[1]) ^ (zi * hash_constants[2])
                 ) & mask
                 var idx := _cell_head[h]
+                
                 while idx != -1:
                     query_ids[query_size] = idx
                     query_size += 1

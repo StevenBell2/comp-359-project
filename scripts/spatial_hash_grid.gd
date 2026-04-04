@@ -42,14 +42,8 @@ func update(client: SpatialClient, old_position: Vector3):
     var new_cell_coords = _get_cell_coords(client.position)
 
     if old_cell_coords != new_cell_coords:
-        if _cells.has(old_cell_coords):
-            _cells[old_cell_coords].erase(client)
-            if _cells[old_cell_coords].is_empty():
-                _cells.erase(old_cell_coords)
-            
-        if not _cells.has(new_cell_coords):
-            _cells[new_cell_coords] = []
-        _cells[new_cell_coords].append(client)
+        remove(client)
+        insert(client)
 
 func clear() -> void:
     _cells.clear()
