@@ -35,8 +35,13 @@ The results confirmed the expected complexity difference. Naive query time showe
 # References
 
 [1] Blazing fast neighbor search with spatial hashing, https://matthias-research.github.io/pages/tenMinutePhysics/11-hashing.pdf (accessed Apr. 3, 2026).
+
 [2] “Spatial Hash Grids & Tales From Game Development,” YouTube, https://www.youtube.com/watch?v=sx4IIQL0x7c (accessed Apr. 3, 2026).
+
 [3] “How I Optimized My JavaScript Project (Complete Walkthrough) | Faster Spatial Hash Grids,” YouTube, https://www.youtube.com/watch?v=oewDaISQpw0 (accessed Apr. 3, 2026).
+
 [4] Matthias-Research, “Pages/tenminutephysics/11-hashing.html at master · Matthias-Research/pages,” GitHub, https://github.com/matthias-research/pages/blob/master/tenMinutePhysics/11-hashing.html (accessed Apr. 3, 2026).
+
 [5] “Godot Docs – 4.6 branch,” Godot Engine documentation, https://docs.godotengine.org/en/stable/ (accessed Apr. 3, 2026).
+
 [6] GDScript tutorials, https://gdscript.com/tutorials/ (accessed Apr. 3, 2026).
