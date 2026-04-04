@@ -8,7 +8,7 @@ func get_nearby(entity, radius, entities) -> Array:
 		if e == entity:
 			continue
 		
-		if(entity.position.distance_to(e.position) < (radius + e.radius)):
+		if (entity.position.distance_to(e.position) < (radius + e.radius)):
 			result.append(e)
 	
 	return result
