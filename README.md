@@ -20,15 +20,15 @@ To validate the efficiency of the spatial hash grid, we directly implemented a b
 
 | Entities | Mode      | Avg Query (ms) | Avg Candidates | Avg Collisions |
 | -------- | --------- | -------------- | -------------- | -------------- |
-| 500      | Naive     | 76.86          | 16             | 2              |
-| 500      | Spatial   | 3.96           | 529            | 1              |
-| 500      | Optimized | 1.88           | 582            | 1              |
-| 3000     | Naive     | 1498           | 586            | 38             |
-| 3000     | Spatial   | 11.88          | 4079           | 34             |
-| 3000     | Optimized | 6.55           | 5648           | 39             |
-| 10000    | Naive     | 18974          | 6400           | 397            |
-| 10000    | Spatial   | 54.45          | 21852          | 408            |
-| 10000    | Optimized | 28.43          | 39502          | 415            |
+| 500      | Naive     | 76.86          | 124750         | 2              |
+| 500      | Spatial   | 3.96           | 18             | 1              |
+| 500      | Optimized | 1.88           | 15             | 1              |
+| 3000     | Naive     | 1498           | 4,498,500      | 38             |
+| 3000     | Spatial   | 11.88          | 533            | 34             |
+| 3000     | Optimized | 6.55           | 533            | 39             |
+| 10000    | Naive     | 18974          | 49,995,000     | 397            |
+| 10000    | Spatial   | 54.45          | 5986           | 408            |
+| 10000    | Optimized | 28.43          | 6006           | 415            |
 
 The results confirmed the expected complexity difference. Naive query time showed consistent O(n^2) behaviour, with doubling entries causing a roughly 4x increase in query time. The Spatial Hash scaled nearly linearly across the same range. At 10000 entities, the spatial hash completed queries in around 54ms compared to the naive's 19000ms, approximately a 350x increase in speed. The optimized implementation maintained roughly 2x speed increase over the original spatial hash grid at each level. At 10000 entities, this meant a 665x increase in speed on average over the naive approach.
 

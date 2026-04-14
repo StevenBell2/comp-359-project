@@ -1,6 +1,6 @@
 extends Node3D
 
-@export var entity_count: int = 100
+@export var entity_count: int = 500
 @export var world_size: float = 40.0
 @export var cell_size: float = 2
 @export var collision_radius: float = 1
@@ -102,7 +102,19 @@ func _update_grid_visual() -> void:
             occupied[Vector3i(floori(p.x * ics), floori(p.y * ics), floori(p.z * ics))] = true
 
     grid_im_mesh.surface_begin(Mesh.PRIMITIVE_LINES)
+
+    var w = world_size / cell_size
     for key: Vector3i in occupied.keys():
+        if (
+            key.x > w - 1 or
+            key.y > w - 1 or
+            key.z > w - 1 or
+            key.x < -w or
+            key.y < -w or
+            key.z < -w
+        ):
+            continue
+
         var o := Vector3(key.x, key.y, key.z) * cell_size
         var s := cell_size
 
@@ -195,10 +207,15 @@ func _setup_shared_mesh() -> void:
     multi_mesh_instance = MultiMeshInstance3D.new()
     multi_mesh_instance.multimesh = multi_mesh
     add_child(multi_mesh_instance)
-
+    
     var camera = Camera3D.new()
     camera.set_script(preload("res://scripts/orbit_camera.gd"))
     add_child(camera)
+
+    camera.position = Vector3(0.0, world_size * 1.25, world_size * 1.75)
+    camera.pitch = -0.55
+    camera.yaw = PI
+
     camera.current = true
 
 func _setup_environment() -> void:
@@ -277,8 +294,8 @@ func _move_entities(delta: float) -> void:
             grid_fast.update(client, old_position)
 
 func _detect_collisions() -> void:
-    var start_time = Time.get_ticks_usec()
-    var radius_sq = collision_radius * collision_radius
+    var start_time := Time.get_ticks_usec()
+    var radius_sq := collision_radius * collision_radius
 
     collision_pair_count = 0
     broadphase_candidate_count = 0
@@ -287,18 +304,19 @@ func _detect_collisions() -> void:
         collision_flags[i] = false
 
     for i in range(entity_count):
-        var client = clients[i]
+        var client := clients[i]
 
         if mode == 0:
             candidates = naive.get_nearby(client, collision_radius, clients)
-            broadphase_candidate_count += candidates.size()
             for other in candidates:
-                if other == client:
-                    continue
-                var other_client = other as SpatialClient
-                var j = other_client.index
+                var other_client := other as SpatialClient
+                var j := other_client.index
+
                 if j <= i:
                     continue
+
+                broadphase_candidate_count += 1
+
                 if client.position.distance_squared_to(other_client.position) <= radius_sq:
                     collision_flags[i] = true
                     collision_flags[j] = true
@@ -306,14 +324,18 @@ func _detect_collisions() -> void:
 
         elif mode == 1:
             grid.find_nearby(client.position, collision_radius, candidates)
-            broadphase_candidate_count += candidates.size()
             for other in candidates:
                 if other == client:
                     continue
-                var other_client = other as SpatialClient
-                var j = other_client.index
+
+                var other_client := other as SpatialClient
+                var j := other_client.index
+
                 if j <= i:
                     continue
+
+                broadphase_candidate_count += 1
+
                 if client.position.distance_squared_to(other_client.position) <= radius_sq:
                     collision_flags[i] = true
                     collision_flags[j] = true
@@ -321,11 +343,17 @@ func _detect_collisions() -> void:
 
         else:
             grid_fast.find_nearby(client.position, collision_radius)
-            broadphase_candidate_count += grid_fast.query_size
+
             for k in range(grid_fast.query_size):
                 var j: int = grid_fast.query_ids[k]
+
+                if j == i:
+                    continue
                 if j <= i:
                     continue
+
+                broadphase_candidate_count += 1
+
                 if client.position.distance_squared_to(clients[j].position) <= radius_sq:
                     collision_flags[i] = true
                     collision_flags[j] = true

@@ -10,6 +10,9 @@ var _table_mask: int = 0
 
 var _cell_head: PackedInt32Array
 var _next: PackedInt32Array
+var _cell_cx: PackedInt32Array
+var _cell_cy: PackedInt32Array
+var _cell_cz: PackedInt32Array
 
 var _clients: Array = []
 var _requires_rebuild: bool = true
@@ -27,9 +30,9 @@ func _init(_cell_size: float, _world_min: Vector3 = Vector3.ZERO, _world_max: Ve
 
     if _world_min != _world_max:
         var ics := 1.0 / _cell_size
-        var nx := int(ceil((_world_max.x - _world_min.x) * ics)) + 1
-        var ny := int(ceil((_world_max.y - _world_min.y) * ics)) + 1
-        var nz := int(ceil((_world_max.z - _world_min.z) * ics)) + 1
+        var nx := maxi(1, int(ceil((_world_max.x - _world_min.x) * ics)))
+        var ny := maxi(1, int(ceil((_world_max.y - _world_min.y) * ics)))
+        var nz := maxi(1, int(ceil((_world_max.z - _world_min.z) * ics)))
         _resize_table(_next_pow2(nx * ny * nz))
 
 func _next_pow2(n: int) -> int:
@@ -68,6 +71,12 @@ func _build() -> void:
     if _next.size() != num:
         _next = PackedInt32Array()
         _next.resize(num)
+        _cell_cx = PackedInt32Array()
+        _cell_cx.resize(num)
+        _cell_cy = PackedInt32Array()
+        _cell_cy.resize(num)
+        _cell_cz = PackedInt32Array()
+        _cell_cz.resize(num)
         query_ids = PackedInt32Array()
         query_ids.resize(num)
 
@@ -81,10 +90,16 @@ func _build() -> void:
 
     for i in range(num):
         var pos: Vector3 = _clients[i].position
+        var cx := floori(pos.x * ics)
+        var cy := floori(pos.y * ics)
+        var cz := floori(pos.z * ics)
+        _cell_cx[i] = cx
+        _cell_cy[i] = cy
+        _cell_cz[i] = cz
         var h: int = (
-            (floori(pos.x * ics) * hash_constants[0]) ^
-            (floori(pos.y * ics) * hash_constants[1]) ^
-            (floori(pos.z * ics) * hash_constants[2])
+            (cx * hash_constants[0]) ^
+            (cy * hash_constants[1]) ^
+            (cz * hash_constants[2])
         ) & mask
         _next[i] = _cell_head[h]
         _cell_head[h] = i
@@ -116,14 +131,18 @@ func find_nearby(pos: Vector3, radius: float) -> void:
                 var idx := _cell_head[h]
                 
                 while idx != -1:
-                    query_ids[query_size] = idx
-                    query_size += 1
+                    if _cell_cx[idx] == xi and _cell_cy[idx] == yi and _cell_cz[idx] == zi: # ADD
+                        query_ids[query_size] = idx
+                        query_size += 1
                     idx = _next[idx]
 
 func clear() -> void:
     _clients.clear()
     _cell_head.fill(-1)
     _next = PackedInt32Array()
+    _cell_cx = PackedInt32Array()
+    _cell_cy = PackedInt32Array()
+    _cell_cz = PackedInt32Array()
     query_ids = PackedInt32Array()
     query_size = 0
     _requires_rebuild = true
